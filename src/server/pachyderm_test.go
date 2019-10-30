@@ -665,7 +665,7 @@ func TestRunPipeline(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 2, len(ji))
 		// now run the pipeline
-		require.NoError(t, c.RunPipeline(pipeline, nil))
+		require.NoError(t, c.RunPipeline(pipeline, nil, ""))
 		// running the pipeline should create a new job
 		require.NoError(t, backoff.Retry(func() error {
 			jobInfos, err := c.ListJob(pipeline, nil, nil, -1, true)
@@ -680,7 +680,7 @@ func TestRunPipeline(t *testing.T) {
 		require.NoError(t, backoff.Retry(func() error {
 			return c.RunPipeline(pipeline, []*pfs.CommitProvenance{
 				client.NewCommitProvenance(dataRepo, "branchA", commitA.ID),
-			})
+			}, "")
 		}, backoff.NewTestingBackOff()))
 
 		// running the pipeline should create a new job
@@ -717,7 +717,7 @@ func TestRunPipeline(t *testing.T) {
 		require.NoError(t, c.RunPipeline(pipeline, []*pfs.CommitProvenance{
 			client.NewCommitProvenance(dataRepo, "branchA", commitA.ID),
 			client.NewCommitProvenance(dataRepo, "branchB", commitB2.ID),
-		}))
+		}, ""))
 
 		// and ensure that the file now has the info from the correct versions of the commits
 		iter, err = c.FlushCommit([]*pfs.Commit{commitA, commitB2}, nil)
@@ -757,7 +757,7 @@ func TestRunPipeline(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 0, len(ji))
 		// now run the pipeline
-		require.YesError(t, c.RunPipeline(pipeline, nil))
+		require.YesError(t, c.RunPipeline(pipeline, nil, ""))
 	})
 
 	// Test on unrelated branch
@@ -807,7 +807,7 @@ func TestRunPipeline(t *testing.T) {
 
 		// now run the pipeline with unrelated provenance
 		require.YesError(t, c.RunPipeline(pipeline, []*pfs.CommitProvenance{
-			client.NewCommitProvenance(dataRepo, "unrelated", commitU.ID)}))
+			client.NewCommitProvenance(dataRepo, "unrelated", commitU.ID)}, ""))
 	})
 
 	// Test with downstream pipeline
@@ -882,7 +882,7 @@ func TestRunPipeline(t *testing.T) {
 		require.NoError(t, backoff.Retry(func() error {
 			return c.RunPipeline(pipeline, []*pfs.CommitProvenance{
 				client.NewCommitProvenance(dataRepo, branchA, commitA.ID),
-			})
+			}, "")
 		}, backoff.NewTestingBackOff()))
 
 		// the downstream pipeline shouldn't have any new jobs, since runpipeline jobs don't propagate
@@ -966,7 +966,7 @@ func TestRunPipeline(t *testing.T) {
 		require.NoError(t, backoff.Retry(func() error {
 			return c.RunPipeline(pipeline, []*pfs.CommitProvenance{
 				client.NewCommitProvenance(dataRepo, branchA, commitA.ID),
-			})
+			}, "")
 		}, backoff.NewTestingBackOff()))
 
 		buffer2 := bytes.Buffer{}
@@ -1034,8 +1034,8 @@ func TestRunPipeline(t *testing.T) {
 		// now run the pipeline with provenance from the same branch
 		require.YesError(t, c.RunPipeline(pipeline, []*pfs.CommitProvenance{
 			client.NewCommitProvenance(dataRepo, branchA, commitA1.ID),
-			client.NewCommitProvenance(dataRepo, branchA, commitA2.ID)},
-		))
+			client.NewCommitProvenance(dataRepo, branchA, commitA2.ID),
+		}, ""))
 	})
 	// Test on pipeline that should always fail
 	t.Run("RerunPipeline", func(t *testing.T) {
@@ -1065,7 +1065,7 @@ func TestRunPipeline(t *testing.T) {
 		commits := collectCommitInfos(t, iter)
 		require.Equal(t, 1, len(commits))
 		// now run the pipeline
-		require.NoError(t, c.RunPipeline(pipeline, nil))
+		require.NoError(t, c.RunPipeline(pipeline, nil, ""))
 
 		// running the pipeline should create a new job
 		require.NoError(t, backoff.Retry(func() error {
