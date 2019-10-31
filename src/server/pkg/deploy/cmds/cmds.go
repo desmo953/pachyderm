@@ -408,16 +408,17 @@ If <object store backend> is \"s3\", then the arguments are:
 				}
 
 				if !awsAccessKeyIDRE.MatchString(amazonCreds.ID) {
-					fmt.Printf("The AWS Access Key seems invalid (does not match %q). "+
-						"Do you want to continue deploying? [yN]\n", awsAccessKeyIDRE)
+					fmt.Fprintf(os.Stderr, "The AWS Access Key seems invalid (does not "+
+						"match %q). Do you want to continue deploying? [yN]\n",
+						awsAccessKeyIDRE)
 					if s.Scan(); s.Text()[0] != 'y' && s.Text()[0] != 'Y' {
 						os.Exit(1)
 					}
 				}
 
 				if !awsSecretRE.MatchString(amazonCreds.Secret) {
-					fmt.Printf("The AWS Secret seems invalid (does not match %q). "+
-						"Do you want to continue deploying? [yN]\n", awsSecretRE)
+					fmt.Fprintf(os.Stderr, "The AWS Secret seems invalid (does not "+
+						"match %q). Do you want to continue deploying? [yN]\n", awsSecretRE)
 					if s.Scan(); s.Text()[0] != 'y' && s.Text()[0] != 'Y' {
 						os.Exit(1)
 					}
