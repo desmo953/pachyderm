@@ -12,7 +12,7 @@ import (
 	"github.com/pachyderm/pachyderm/src/client/pkg/require"
 	"github.com/pachyderm/pachyderm/src/client/pps"
 	tu "github.com/pachyderm/pachyderm/src/server/pkg/testutil"
-	"gopkg.in/pachyderm/yaml.v3"
+	"github.com/pachyderm/pachyderm/src/server/pkg/yamlpb"
 )
 
 var pachClient *client.APIClient

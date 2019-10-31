@@ -17,7 +17,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 
 	ppsclient "github.com/pachyderm/pachyderm/src/client/pps"
-	"gopkg.in/pachyderm/yaml.v3"
+	"github.com/pachyderm/pachyderm/src/server/pkg/yamlpb"
 )
 
 type pipelineDecoder interface {
@@ -94,7 +94,7 @@ func NewPipelineManifestReader(path string) (result *PipelineManifestReader, ret
 		}, nil
 	}
 	return &PipelineManifestReader{
-		decoder: newYAMLDecoder(bytes.NewReader(pipelineBytes)),
+		decoder: yamlpb.NewDecoder(bytes.NewReader(pipelineBytes)),
 	}, nil
 }
 

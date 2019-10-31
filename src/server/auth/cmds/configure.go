@@ -1,7 +1,6 @@
 package cmds
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,9 +11,8 @@ import (
 	"github.com/pachyderm/pachyderm/src/client/auth"
 	"github.com/pachyderm/pachyderm/src/client/pkg/grpcutil"
 	"github.com/pachyderm/pachyderm/src/server/pkg/cmdutil"
-	"gopkg.in/pachyderm/yaml.v3"
+	"github.com/pachyderm/pachyderm/src/server/pkg/yamlpb"
 
-	"github.com/gogo/protobuf/jsonpb"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +45,7 @@ func GetConfigCmd() *cobra.Command {
 					return fmt.Errorf("could not marshal response:\n%v\ndue to: %v", resp.Configuration, err)
 				}
 			case "yaml":
-				output, err = yaml.Marshal(resp.Configuration)
+				output, err = yamlpb.Marshal(resp.Configuration)
 				if err != nil {
 					return fmt.Errorf("could not marshal response:\n%v\ndue to: %v", resp.Configuration, err)
 				}
@@ -93,26 +91,10 @@ func SetConfigCmd() *cobra.Command {
 				return errors.New("must set input file (use \"-\" to read from stdin)")
 			}
 
-			// Parse config as YAML into an unstructured document (JSON is a subset of
-			// YAML, so this will allow us to convert both JSON configs and YAML
-			// configs to JSON), and then re-parse the JSON using jsonpb, which has
-			// special support for reading timestamps and such into proto-generated
-			// structs
+			// parse config
 			var config auth.AuthConfig
-			holder := map[string]interface{}{}
-			// deserialize yaml/json into 'holder'
-			if err := yaml.Unmarshal(rawConfigBytes, &holder); err != nil {
+			if err := yamlpb.Unmarshal(rawConfigBytes, &config); err != nil {
 				return fmt.Errorf("could not parse config: %v", err)
-			}
-			// serialize 'holder' to json
-			jsonConfigBytes, err := json.Marshal(holder)
-			if err != nil {
-				return fmt.Errorf("serialization error while canonicalizing auth config: %v", err)
-			}
-			// parse again into an AuthConfig, with special parser
-			decoder := json.NewDecoder(bytes.NewReader(jsonConfigBytes))
-			if err := jsonpb.UnmarshalNext(decoder, &config); err != nil {
-				return fmt.Errorf("parse error while canonicalizing auth config: %v", err)
 			}
 			// TODO(msteffen): try to handle empty config?
 			_, err = c.SetConfiguration(c.Ctx(), &auth.SetConfigurationRequest{

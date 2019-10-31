@@ -25,7 +25,7 @@ import (
 	"github.com/pachyderm/pachyderm/src/server/pkg/deploy/images"
 	_metrics "github.com/pachyderm/pachyderm/src/server/pkg/metrics"
 	"github.com/pachyderm/pachyderm/src/server/pkg/obj"
-	"gopkg.in/pachyderm/yaml.v3"
+	"github.com/pachyderm/pachyderm/src/server/pkg/yamlpb"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cobra"
@@ -81,7 +81,7 @@ func newYAMLEncoder() *yamlEncoder {
 }
 
 func (e *yamlEncoder) Encode(item interface{}) error {
-	bytes, err := yaml.Marshal(item)
+	bytes, err := yamlpb.Marshal(item)
 	if err != nil {
 		return err
 	}
