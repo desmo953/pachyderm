@@ -397,6 +397,9 @@ integration-tests:
 test-proto-static:
 	./etc/proto/test_no_changes.sh
 
+test-deploy-manifests:
+	./etc/testing/deploy-manifests/validate.sh
+
 proto: docker-build-proto
 	find src -regex ".*\.proto" \
 	| xargs tar cf - \
